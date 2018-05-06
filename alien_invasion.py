@@ -10,7 +10,6 @@ from button import Button
 
 def run_game():
     """初始化游戏并创建一个屏幕对象"""
-
     pygame.init()
     ai_settings = Settings()
     screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
@@ -26,7 +25,7 @@ def run_game():
 
     while True:
         # 监视键盘和鼠标事件
-        gf.check_events(ai_settings, screen, ship, bullets)
+        gf.check_events(ai_settings, screen, stats, play_button,aliens, ship, bullets)
         if stats.game_active:
             ship.update()
             bullets.update()
@@ -34,7 +33,7 @@ def run_game():
             gf.update_bullets(ai_settings, screen, ship, aliens, bullets)
             gf.update_aliens(ai_settings, stats, screen, ship, aliens, bullets)
         # 每次循环时都重新绘制屏幕
-        gf.update_screen(ai_settings, screen, ship, aliens, bullets, play_button)
+        gf.update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button)
 
 
 run_game()

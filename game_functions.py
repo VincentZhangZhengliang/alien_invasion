@@ -9,16 +9,33 @@ from alien import Alien
 from time import sleep
 
 
-def check_events(ai_settings, screen, ship, bullets):
+def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y):
+    """玩家在单击play按钮时开始游戏"""
+    if play_button.rect.collidepoint(mouse_x, mouse_y):
+        stats.reset_stats()
+        stats.game_active = True
+
+        # 清空外星人列表和子弹列表
+        aliens.empty()
+        bullets.empty()
+
+        # 创建一群新的外星人，并让飞船剧中
+        create_fleet(ai_settings, screen, ship, aliens)
+        ship.center_ship()
+
+
+def check_events(ai_settings, screen, stats, play_button,aliens, ship, bullets):
     """响应按键和鼠标事件"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             check_keydown_events(event, ai_settings, screen, ship, bullets)
-
         elif event.type == pygame.KEYUP:
             check_keyup_events(event, ship)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            check_play_button(ai_settings,screen,stats, play_button, ship,aliens,bullets,mouse_x, mouse_y)
 
 
 def check_keydown_events(event, ai_settings, screen, ship, bullets):
@@ -48,7 +65,7 @@ def check_keyup_events(event, ship):
         ship.moving_left = False
 
 
-def update_screen(ai_settings, screen, ship, aliens, bullets, play_button):
+def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button):
     """更新屏幕上的图像,并切换到新屏幕"""
     # 每次循环时都重绘屏幕
     screen.fill(ai_settings.bg_color)
@@ -57,6 +74,9 @@ def update_screen(ai_settings, screen, ship, aliens, bullets, play_button):
     ship.blitme()
     aliens.draw(screen)
     # 让最近绘制的屏幕可见
+    if not stats.game_active:
+        play_button.draw_button()
+
     pygame.display.flip()
 
 
@@ -173,7 +193,7 @@ def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
     """检查是否有外星人到达了屏幕底端"""
     screen_rect = screen.get_rect()
 
-    for alien in aliens.sprites:
+    for alien in aliens.sprites():
         if alien.rect.bottom >= screen_rect.bottom:
             ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
             break
